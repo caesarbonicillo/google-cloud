@@ -1,0 +1,130 @@
+ITC134 FL19 Week 8 - Google Cloud Platform
+
+Bill Newman - https://tinyurl.com/itc134-fl19-lamp-stack-3076
+
+To access the google cloud platform, type: https://cloud.google.com
+To access the console, look for a link named console toward the top right
+To create a VM, find Compute Engine in the nav on the left, then select VM Instances
+Click CREATE INSTANCE (you may need to click CREATE PROJECT)
+Create a name, for example web-server-test (to identify purpose for the VM)
+Change the Region to something local, for example Oregon
+Change the Machine type to the smallest possible, f1-micro
+Since we’re building a web server, we want to set Firewall to HTTP and HTTPS
+Then we clicked CREATE and waited
+Once the instance was running, we saw something like this:
+
+
+To connect from a browser to the command line, find the letters SSH to the right and click and a window will open up a command line on our VM.
+To install the Apache web server, we used this command: sudo apt-get update && sudo apt-get install apache2 -y
+To navigate to the web folder, we typed the following: cd /var/www/html/
+To view the default web page, we went back to the console and clicked the External IP link, and changed the URL to be insecure (http) http://34.82.73.108/
+Next we installed git: sudo apt install git
+Next we associated our git user.name with this installation: git config --global user.name "Bill Newman"
+Next we associated our git user.email with this installation: git config --global user.email "bill@example.com"
+As a sample, we used git clone to copy/paste a repo in our web space: sudo git clone https://github.com/newmanix/js-cards.git
+We were able to view the web page here: http://34.82.73.108/js-cards/
+
+
+
+
+
+
+
+
+Lamp Stack Install
+
+On Thursday we started to build a LAMP stack.  We followed the basic steps of setting up a VM on GCP as above, with the exception of update apt, in which we did this instead:
+
+sudo apt-get update -y && sudo apt-get upgrade -y
+
+We installed Apache, as above.
+
+Next we installed php:
+
+sudo apt install php -y
+
+To see if PHP was installed correctly, we checked the version:
+
+php -v
+
+We navigated to the web folder to create a test PHP page:
+
+cd /var/www/html/
+
+We opened nano to create the page named info.php:
+
+sudo nano info.php
+
+The page named info.php let’s us see what modules were installed with PHP.  Here’s the code from the page:
+
+<?php
+
+phpinfo();
+
+Once saved, we can go to the page in our web space to see what PHP modules are installed:
+
+http://xxx.xxx.xxx.xxx/info.php
+
+While installing PHP, we noticed that we didn’t get all of the modules we need, in particular mysqli which connects to MySQL.  Here’s the additional command we need to run after installing PHP (from the codeshare):
+
+sudo apt-get install php-pear php7.0-dev php7.0-zip php7.0-curl php7.0-gd php7.0-mysql php7.0-mcrypt php7.0-xml libapache2-mod-php7.0 -y
+
+In order to see the changes to PHP (as visible via info.php) , we restarted Apache:
+
+sudo service apache2 restart
+
+MySQL Install: While installing MySQL, we wish to avoid the root user from having no password.  Therefore we used the following to indicate a password in advance: (from the codeshare)
+
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password MYPASSWORD123'
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password MYPASSWORD123'
+
+
+
+
+To install MySQL (or in our case MariaDB) we used the following command:
+
+sudo apt install mysql-server mysql-client -y
+
+To login to MySQL, we typed the following:
+
+sudo mysql -u root -p
+
+Next we created a database:
+
+create database test_db;
+
+In order to work with our database, we typed the following:
+
+use test_db;
+
+We then copied some SQL (from the codeshare) to place some data in our new database:
+
+create table test_Customers
+( CustomerID int unsigned not null auto_increment primary key,
+LastName varchar(50),
+FirstName varchar(50),
+Email varchar(80)
+);
+
+insert into test_Customers values (NULL,"Smith","Bob","bob@example.com");
+insert into test_Customers values (NULL,"Jones","Bill","bill@example.com");
+insert into test_Customers values (NULL,"Doe","John","john@example.com");
+insert into test_Customers values (NULL,"Rules","Ann","ann@example.com");
+
+To view the data, type:
+
+select * from test_Customers;
+
+Now that we have data, we can exit MySQL:
+
+exit;
+
+
+Be sure to shut off your servers!
+
+
+
+
+
+
+
